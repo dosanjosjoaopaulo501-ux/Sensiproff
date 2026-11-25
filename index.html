@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101116">
+<title>SENSI PRO FF</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0c0d12;color:#f5f5f7;font:16px Arial,sans-serif}
+main{max-width:520px;margin:auto;padding:22px 17px 38px}
+header{padding:18px 4px 22px} .tag{color:#ff4655;font-size:11px;letter-spacing:3px;font-weight:bold}
+h1{font-size:34px;margin:7px 0 4px;font-weight:900;letter-spacing:1px}h1 span{color:#ff4655}
+.sub{color:#92939d;font-size:13px}
+.panel{background:#171920;border:1px solid #292b35;border-radius:17px;padding:17px;margin:13px 0}
+h2{font-size:15px;margin:0 0 14px}
+label{display:block;color:#aeb0ba;font-size:12px;margin:12px 0 7px}
+input,select{width:100%;background:#0e1016;color:#fff;border:1px solid #30333e;border-radius:10px;padding:13px;font-size:14px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button{border:0;border-radius:11px;padding:14px 12px;font-weight:bold;font-size:14px;cursor:pointer}
+.primary{width:100%;background:#ff3548;color:white;margin-top:14px}
+.secondary{background:#292c36;color:#fff;width:100%;margin-top:10px}
+.stat{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #2a2c35}
+.stat:last-child{border:0}.stat span{color:#c5c6ce;font-size:14px}
+.stat input{width:82px;text-align:center;padding:9px}
+.modes{display:flex;gap:8px;flex-wrap:wrap}
+.mode{background:#292c36;color:#d8d9df;padding:10px 12px}.mode.active{background:#ff3548;color:white}
+.note{color:#92939d;font-size:11px;line-height:1.5;margin:12px 2px}
+#result{display:none}
+</style></head>
+<body><main>
+<header><div class="tag">FREE FIRE • CONFIGURADOR</div><h1>SENSI <span>PRO</span></h1><div class="sub">Monte, ajuste e salve sua configuração.</div></header>
+<section class="panel">
+<h2>01 / SEU APARELHO</h2>
+<label>Modelo do celular</label><input id="phone" placeholder="Ex.: Realme C55">
+<div class="row"><div><label>Taxa de atualização</label><select id="hz"><option value="60">60 Hz</option><option value="90">90 Hz</option><option value="120">120 Hz</option><option value="144">144 Hz</option></select></div>
+<div><label>Estilo de jogo</label><select id="style"><option value="precisao">Precisão</option><option value="capa">Foco em capa</option><option value="equilibrada">Equilibrada</option></select></div></div>
+<button class="primary" onclick="generate()">GERAR MINHA SENSI</button>
+</section>
+<section class="panel"><h2>02 / AJUSTE MANUAL</h2><div id="sliders"></div>
+<button class="secondary" onclick="copyValues()">COPIAR CONFIGURAÇÃO</button>
+</section>
+<section class="panel" id="result"><h2>03 / CONFIGURAÇÃO GERADA</h2><p class="sub" id="summary"></p></section>
+<p class="note">As configurações são pontos de partida para testar dentro do jogo. O resultado varia conforme aparelho, tela, desempenho e preferência. Este app não altera o Free Fire nem promete vantagem automática.</p>
+</main>
+<script>
+const names=["Geral","Ponto vermelho","Mira 2x","Mira 4x","Mira AWM","Olhadinha"];
+const defaults=[95,90,85,78,45,80];
+const host=document.getElementById('sliders');
+names.forEach((n,i)=>{let d=document.createElement('div');d.className='stat';d.innerHTML=`<span>${n}</span><input type="number" min="0" max="200" id="v${i}" value="${defaults[i]}">`;host.appendChild(d)});
+function values(){return names.map((n,i)=>Math.max(0,Math.min(200,Number(document.getElementById('v'+i).value)||0)))}
+function generate(){
+ let hz=Number(document.getElementById('hz').value), style=document.getElementById('style').value;
+ let boost=hz>=120?4:hz>=90?2:0, offset=style==='capa'?5:style==='precisao'?-4:0;
+ let v=[98,92,86,78,48,82].map((x,i)=>Math.max(0,Math.min(200,x+boost+offset-(i===4?Math.round(offset/2):0))));
+ v.forEach((x,i)=>document.getElementById('v'+i).value=x);
+ document.getElementById('summary').textContent=(document.getElementById('phone').value||'Aparelho não informado')+' • '+hz+' Hz • '+({capa:'Foco em capa',precisao:'Precisão',equilibrada:'Equilibrada'}[style]);
+ document.getElementById('result').style.display='block';
+}
+function copyValues(){let s=names.map((n,i)=>n+': '+values()[i]).join('\\n');if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(s).then(()=>alert('Configuração copiada!')).catch(()=>alert(s))}else alert(s)}
+</script></body></html>
